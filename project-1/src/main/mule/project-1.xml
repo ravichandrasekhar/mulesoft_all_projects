@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="project-1Flow" doc:id="0cecfded-8704-4011-8225-4ce3edffa8fd" >
+		<http:listener doc:name="project1Listener" doc:id="1b45ec8e-1079-41cb-a958-ec967ec0f611" config-ref="HTTP_Listener_config" path="/project1"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dbd09f98-4c66-40c5-ba77-fea8418db3ee" message="#[flow.name]"/>
+		<db:insert doc:name="Insert" doc:id="8063acad-c26f-4d4b-8e2c-b038ba9eaf4b" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into production.categories (category_name) values (:value)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	value : attributes.queryParams.productName default 'ravichandrasekharvadrevu'
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="dfbdfd91-ff12-413e-9aba-dffeb40ee62c" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

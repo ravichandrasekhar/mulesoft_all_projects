@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="f6a83868-4da6-4191-938d-417be9eebfb6" file="properties\dev.yaml" key="ravichandrasekha" />
+	<configuration-properties doc:name="Configuration properties" doc:id="c54d2856-67da-4e65-9ee9-24de2cda2c03" file="properties\dev.yaml" />
+</mule>

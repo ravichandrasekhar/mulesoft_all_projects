@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ccfe6747-28f6-478d-aa2a-e391447790d1" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="mulejavaFlow" doc:id="b480bf0b-f358-43e5-835a-5cc7e7a23f89" >
+		<http:listener doc:name="Listener" doc:id="ab85207e-7928-4671-8ee2-0cc1033c3c5e" config-ref="HTTP_Listener_config" path="/muleandjava"/>
+		<java:invoke-static doc:name="Invoke static" doc:id="74269122-5e56-4f33-a198-3b3011215b84" class="mulejava.mulejavaDemo" method="getWelcomeMessage()"/>
+		<logger level="INFO" doc:name="Logger" doc:id="462aa640-db22-457c-b36c-1c2f34efe752" message="#[payload]"/>
+	</flow>
+	<flow name="mulejavaFlow1" doc:id="d25e6b8f-2f99-4157-9a42-fe3fc8d0a503" >
+		<http:listener doc:name="Listener" doc:id="a473cbf7-69e3-4890-a1de-2b8c74cae66a" config-ref="HTTP_Listener_config" path="/welcome"/>
+		<java:invoke-static method="welome(java.lang.String,java.lang.String)" doc:name="Invoke static" doc:id="de5cbc00-8693-4366-ade6-b69fde4a1792" class="mulejava.mulejavaDemostatic">
+			<java:args ><![CDATA[#[{
+	arg0: attributes.queryParams.firstName,
+	arg1: attributes.queryParams.lastName
+}]]]></java:args>
+		</java:invoke-static>
+	</flow>
+	<flow name="mulejavaFlow2" doc:id="f71614ee-aa30-4ffd-9b67-7f8aec845f4c" >
+		<http:listener doc:name="Listener" doc:id="9bdc1178-fb78-4c6c-adff-a3b99cb53afc" config-ref="HTTP_Listener_config" path="/newinovke"/>
+		<java:new constructor="mulejavaDemostatic()" doc:name="New" doc:id="2adfada9-ec47-4da4-82cc-4643ef7cc105" class="mulejava.mulejavaDemostatic" target="objectOfStatic"/>
+		<java:invoke doc:name="Invoke" doc:id="ef354d04-66a8-4c3b-933d-25a07813e683" instance="#[vars.objectOfStatic]" class="mulejava.mulejavaDemostatic" method="getBalance(java.lang.String)">
+			<java:args ><![CDATA[#[{
+ arg0: attributes.queryParams.bankname
+}]]]></java:args>
+		</java:invoke>
+		<java:validate-type doc:name="Validate type" doc:id="ed1375e6-55cc-43cc-9588-66f69c46c82b" class="mulejava.mulejavaDemostatic" instance="#[vars.objectOfStatic]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f074ea03-3e2f-4b96-95b5-00c4ba382414" message="#[payload]"/>
+	</flow>
+</mule>

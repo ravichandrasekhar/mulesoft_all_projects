@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="0cc0eb41-b29d-4729-95a6-b984267ff5eb" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="worksetFlow" doc:id="d44c8f1b-e525-4f28-9d63-0414dd07ea63" >
+		<http:listener doc:name="Listener" doc:id="ba54f4b1-c170-4fb8-bfa2-3a4ce70409af" config-ref="HTTP_Listener_config" path="/add"/>
+		<choice doc:name="Choice" doc:id="375ec189-dd9b-45c9-aafa-bd207cdf684c" >
+			<when expression="#[((!isBlank(payload.number1)) and (!isBlank(payload.number2)))]">
+				<ee:transform doc:name="Transform Message" doc:id="76dd0f97-6ba9-49c9-976d-e0cb5dba4fc6">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result" : payload.number1 + payload.number2 
+	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+			</when>
+			<otherwise>
+				<logger level="INFO" doc:name="Logger" doc:id="b12b1f11-e423-400c-a577-9479a02f9019" message="input is not in   correct Format"/>
+				<set-payload value="input is not in   correct Format" doc:name="Set Payload" doc:id="8ad9d21b-0924-4b45-b522-7c7dd404bfae" />
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

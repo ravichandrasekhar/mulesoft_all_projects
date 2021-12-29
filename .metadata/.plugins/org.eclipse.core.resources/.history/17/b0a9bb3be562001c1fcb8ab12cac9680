@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="772bcb91-fdd1-4933-befe-963cc9890c17" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="routersworkassesment-ravichandrasekharFlow" doc:id="8a8233d2-11c8-4655-b1ca-744f14a3385b" >
+		<http:listener doc:name="Listener" doc:id="8ce72882-f6c7-412f-a1b5-d7e0173ec9a3" config-ref="HTTP_Listener_config" path="/ScatterGather"/>
+		<set-payload value="#['abc']" doc:name="originalPayload" doc:id="4a2c6ea4-7547-4749-ad23-575072c10d49" />
+		<scatter-gather doc:name="Scatter-Gather" doc:id="ad4b2cd5-7ba7-4bd5-a170-6c9cd6c225a0" >
+			<route >
+				<set-variable value="payload ++ &quot; &quot; ++ 'route1'" doc:name="route1" doc:id="8c23f9d9-7e6a-4628-bf56-80d197586cb6" variableName="route1"/>
+			</route>
+			<route >
+				<set-variable value="#[payload ++ &quot; &quot; ++ 'route2']" doc:name="route2" doc:id="ae722b14-dcd1-4b8e-b740-2700a17a6a06" variableName="route2"/>
+			</route>
+			<route >
+				<set-variable value="#[payload ++ &quot; &quot; ++ 'route3']" doc:name="route3" doc:id="53d3bbb2-5564-4057-bfdb-67ccf5cf1718" variableName="route3"/>
+			</route>
+		</scatter-gather>
+		<set-payload value="#[payload]" doc:name="Aggerator" doc:id="a7ec0ac8-8ffa-47e6-8f40-0bdd1f9b9733" mimeType="application/json"/>
+	</flow>
+</mule>

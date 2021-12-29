@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_67391ec1_888f_4046_9cdc_46c2a9dddebe_Output_Variables_counter = {| count: Number |}
+

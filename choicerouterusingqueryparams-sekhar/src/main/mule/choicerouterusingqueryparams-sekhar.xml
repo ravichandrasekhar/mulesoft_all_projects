@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="14001730-f004-4430-bc00-345df24721dd" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="choicerouterusingqueryparams-sekharFlow" doc:id="a1d623ec-c1f6-4af3-93ba-3aa0cf67d597" >
+		<http:listener doc:name="Listener" doc:id="c5f9da91-c4a9-43d0-b01f-7051104bd963" config-ref="HTTP_Listener_config" path="/calculatorquery"/>
+		<logger level="INFO" doc:name="Logger" doc:id="b4d251ee-0678-4c28-9333-9f56985e37b7" message="#[payload]"/>
+		<choice doc:name="Choice" doc:id="deed42f1-4eb1-4a4d-81d0-05c7a3e0a198" >
+			<when expression='#[attributes.queryParams.operation  == "add"]'>
+				<logger level="INFO" doc:name="additon operation" doc:id="8168c6ba-a77d-4325-bfe9-7b61d0a27379" message="additon operation has been executed"/>
+				<ee:transform doc:name="Transform Message" doc:id="08e702a3-5819-4bd7-a2db-0d0ed46f79e9" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"add": attributes.queryParams.number1 as Number + attributes.queryParams.number2 as Number
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<when expression='#[attributes.queryParams.operation  == "sub"]'>
+				<logger level="INFO" doc:name="Logger" doc:id="d96d2896-c619-4b6e-871d-1dba7bfe25dd" message="subtraction operation has been executed"/>
+				<ee:transform doc:name="Transform Message" doc:id="e86814a3-3de9-4f7f-891e-405901fbf885" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"subtract": attributes.queryParams.number1 as Number - attributes.queryParams.number2 as Number
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="d55d25e2-4724-4a69-b01f-b200ed5c7a7b" message="#[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

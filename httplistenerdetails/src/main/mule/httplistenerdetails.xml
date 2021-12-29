@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="573a03d6-59ef-41e8-8a84-6d0134e61a1b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="a8e22dd5-e506-4365-9d14-d7bb088a437e" >
+		<http:request-connection host="assessment1-ravichandrasekhar.us-e2.cloudhub.io"/>
+	</http:request-config>
+	<flow name="httplistenerdetailsFlow" doc:id="b0351aeb-6d63-4038-87e3-a450d54c1ba0" >
+		<http:listener doc:name="/httppath" doc:id="2f2578a7-f6d8-48bb-aced-62230731af02" config-ref="HTTP_Listener_config" path="/httppath"/>
+		<set-variable value="#[uuid()]" doc:name="correlationId" doc:id="a60aa7c9-111d-4f72-a344-bf89aec90437" variableName="correlationId"/>
+		<logger level="INFO" doc:name="display The CorrelationId" doc:id="fb1de0c9-37f0-440e-940f-e9d4cdfdb632" message="correlationId -- #[vars.correlationId]"/>
+		<ee:transform doc:name="Input Payload" doc:id="d861c599-f30a-4764-8346-6b89e9eb4417" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+    "EmpID": 123,
+    "EmpName": "Sekhar",
+    "EmpSal" : 12345
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="display Input Payload" doc:id="b37247b4-44f5-4176-8861-8a4c693cf3b2" message="#[payload]"/>
+		<http:request method="POST" doc:name="calling an thirdParty Rest Api" doc:id="9b3928c6-0662-4a66-9f40-c803d17e64f5" config-ref="HTTP_Request_configuration" path="/assesment">
+		</http:request>
+		<logger level="INFO" doc:name="display correlationId and display output payload" doc:id="005f9419-7217-4b31-bf58-e32dc25351a8" message="correlationId -  #[vars.correlationId] - response received - #[vars.responseVariable] - #[payload]"/>
+	</flow>
+</mule>

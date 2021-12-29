@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="fa32de93-6666-45af-a9ac-e93f3fd2bfd6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="ReadFile" doc:name="File Config" doc:id="54a108e1-2814-46e6-ad12-5421d3e42f4e" >
+		<file:connection workingDir="C:\Users\ravichandrav\Documents\readfile" />
+	</file:config>
+	<file:config name="writeFile" doc:name="File Config" doc:id="53bd8997-66d0-48f6-8c21-5c85012105ca" >
+		<file:connection workingDir="C:\Users\ravichandrav\Documents\writeFile" />
+	</file:config>
+	<flow name="fileconnector-ravichandraFlow" doc:id="d9f0b3eb-d97e-47b9-b816-b1eb9b49525a" >
+		<http:listener doc:name="/readop" doc:id="a21b16a2-29d8-4d64-af4e-5f3caa764935" config-ref="HTTP_Listener_config" path="/readop"/>
+		<file:read doc:name="Read operation" doc:id="d26785bb-3aaa-44df-8ba8-84bd09e81fa5" config-ref="ReadFile" path="readFile.txt" target="readOneVariable"/>
+		<ee:transform doc:name="usingtargetVariable" doc:id="1dd8ae92-5ee8-4d20-9c40-a60f8f63c6b0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"name": "sekhar",
+	"fileoutput": vars.readOneVariable ++ " " ++ "appending new message of data line"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="read Logger" doc:id="38be7efe-55f2-4355-98d6-43ca619c59be" message="#[payload]" />
+		<file:write doc:name="Write operation" doc:id="41a792f3-8859-4674-9cd0-41e82ae7a064" config-ref="writeFile" path="writefileoperation.txt" mode="APPEND"/>
+		<set-payload value="File has been written successfully" doc:name="writePayload" doc:id="cdead296-2fd4-4f47-ac37-8311c8db4ace" />
+		<logger level="INFO" doc:name="writeLogger" doc:id="af6eb3d4-d42e-4bf6-9d0b-8c67d3bd4b4f" message="File has been created"/>
+	</flow>
+</mule>

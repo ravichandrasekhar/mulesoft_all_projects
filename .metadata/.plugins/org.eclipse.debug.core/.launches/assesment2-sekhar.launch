@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.mule.tooling.runtime.muleServerLaunchType">
+    <stringAttribute key="launch_mule_server_version" value="org.mule.tooling.server.4.4.0.ee"/>
+    <stringAttribute key="mule-agent-port" value="55696"/>
+    <stringAttribute key="mule-agent-token-auth" value="c0d421da-4350-4075-8692-7617149914ab"/>
+    <listAttribute key="mule-project-names">
+        <listEntry value="assesment2-sekhar"/>
+    </listAttribute>
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="assesment2-sekhar"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-M-XX:-UseBiasedLocking -M-Dfile.encoding=UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication"/>
+</launchConfiguration>

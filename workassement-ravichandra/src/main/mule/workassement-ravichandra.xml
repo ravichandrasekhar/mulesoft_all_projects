@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bcb2dd28-80a1-4c44-838c-18e4f19ab913" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="workassement-ravichandraFlow" doc:id="f103615a-95bb-47d0-b7b2-7dc9621ba265" >
+		<http:listener doc:name="Listener" doc:id="521d82e0-a929-49d0-8a46-fa020a4123ec" config-ref="HTTP_Listener_config" path="/helloworld"/>
+		<set-variable value="#[uuid()]" doc:name="Set Variable" doc:id="bc0c4b2d-fdc7-48cf-b948-5d78c8b71d2b" variableName="correlationId"/>
+		<logger level="INFO" doc:name="display The CorrelationId" doc:id="d872b8e6-1d53-417f-809f-688ff0f23e16" message="CorrelationId- #[vars.CorrelationId]"/>
+		<logger level="INFO" doc:name="display the Original Payload" doc:id="01c94735-fd59-42a1-949d-2ff5306af23f" message="CorrelationId- #[vars.CorrelationId] - Before payload  - #[payload]"/>
+		<set-variable value="#[payload]" doc:name="originalPayload" doc:id="5e111fd4-6adc-40d0-9103-d9ef3c2038bf" variableName="originalPayload"/>
+		<ee:transform doc:name="Transform Message" doc:id="c9457174-dea5-49fe-982d-149dbf239f39" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+root: payload]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="counter" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"count":1
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="7d09d1ba-4a19-4ecd-9b49-282fd50c2078" message="CorrelationId- #[vars.orginalPayload] -- correlationId -#[payload] -- correlationId-- #[vars.counter]"/>
+		<set-payload value='"Welcome  to Mule"' doc:name='"Welcome  to Mule"' doc:id="27ee869b-39b6-43a2-877b-75f61de06d08" />
+		<flow-ref doc:name="workassement-ravichandra-PrivateFlow" doc:id="719f3178-034a-4215-9fd6-2459c484adf6" name="workassement-ravichandra-PrivateFlow"/>
+		<flow-ref doc:name="workassement-ravichandra-SubFlow" doc:id="7900862d-ec70-4f1e-a5c6-20eb22c127ea" name="workassement-ravichandra-SubFlow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="0b30e383-486c-4e52-ac59-3522f435d39d" message="correlationid - #[vars.CorrelationId] - #[payload]"/>
+	</flow>
+	<flow name="workassement-ravichandra-PrivateFlow" doc:id="67391ec1-888f-4046-9cdc-46c2a9dddebe" >
+		<logger level="INFO" doc:name="Logger" doc:id="41aff254-d213-4578-96aa-40004ba828bc" message='CorrelationId- #[vars.CorrelationId] --"privateFlow"'/>
+	</flow>
+	<sub-flow name="workassement-ravichandra-SubFlow" doc:id="7145f08c-d5fb-421f-8b92-5e87e855dad7" >
+		<logger level="INFO" doc:name="Logger" doc:id="e163edc3-12a0-4cfb-babb-28384b4f7c20" message='CorrelationId- #[vars.CorrelationId]-"Sub Flow"'/>
+	</sub-flow>
+	<flow name="workassement-ravichandraFlow1" doc:id="7685292d-7b74-4734-9ca9-1275b2a390fb" >
+		<http:listener doc:name="Listener" doc:id="2d0efbc0-d583-4c14-9669-8b6ac7ab9b85" config-ref="HTTP_Listener_config" path="/multiply"/>
+		<logger level="INFO" doc:name="display Before Logger" doc:id="6a83801d-a893-465b-813e-087375f831db" message='"Before Logger"'/>
+		<ee:transform doc:name="Transform Message" doc:id="7810ebb6-1852-48f0-aeef-eb81b60c6aa6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"result": (attributes.queryParams.m1 as Number) * (attributes.queryParams.m2 as Number) *(attributes.queryParams.m3 as Number)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="display payload" doc:id="fb8fab84-698f-4faf-bb06-84d28aecf7f6" message="After payload - #[payload]"/>
+	</flow>
+	<flow name="workassement-ravichandraFlow2" doc:id="cc92c04f-b084-4326-a53b-8b83437b15e7" >
+		<http:listener doc:name="Listener" doc:id="9b84bad0-5f65-4128-b7a0-f7df6a48ab2b" config-ref="HTTP_Listener_config" path="/headerPath"/>
+		<logger level="INFO" doc:name="Logger" doc:id="29dfe829-b9a9-47c9-94f8-7facb0702d3f" message='"Before Logger"'/>
+		<ee:transform doc:name="Transform Message" doc:id="e83772b8-40e9-4e74-9e13-26ffe070c571" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"client id": attributes.headers.client_id,
+	"client secret": attributes.headers.client_secret
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e37d5672-9449-46c1-b4ce-b0a5a63248bc" message="#[payload]"/>
+	</flow>
+	<flow name="workassement-ravichandraFlow3" doc:id="a5cd7ecd-e54e-4749-8731-dfd70744a186" >
+		<http:listener doc:name="Listener" doc:id="4bbbe4b2-c725-41dc-b800-5bf799aacc73" config-ref="HTTP_Listener_config" path="/javausingjavamodule"/>
+		<java:invoke-static doc:name="Invoke static" doc:id="8f9ae53f-5010-4f5f-90b8-979bd37ca29a" class="mulejava.mulejavaDemo" method="helloRavi()"/>
+		<logger level="INFO" doc:name="Logger" doc:id="571cb09f-9544-491b-a3f9-4b80979f663e" message="#[payload]"/>
+	</flow>
+	<flow name="workassement-ravichandraFlow4" doc:id="ad8ab19c-3c81-4cd0-9979-64f9b9de4874" >
+		<http:listener doc:name="Listener" doc:id="2db96daf-1dbb-485f-a05c-29fa67c9570e" config-ref="HTTP_Listener_config" path="/javausingdwl"/>
+		<ee:transform doc:name="Transform Message" doc:id="f06d1a5d-a93b-48c9-a2da-d39e7a2cd28e" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import java!mulejava::mulejavaDemo
+---
+{
+	example: mulejavaDemo::helloRavi(),
+	"Name" : "Sekhar",
+	"Age" :  29,
+	"Address": "RJY"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="3bb8cf9c-654e-4897-9380-6e4648aeac53" message="#[payload]"/>
+	</flow>
+</mule>

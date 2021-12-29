@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3417cc92-c044-4a4b-93f6-c0e68410001e" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="17c63e08-8c0b-4368-bb15-79ddc20a11c9" >
+		<http:request-connection host="assessment-2-ravichandrasekhar.us-e2.cloudhub.io" />
+	</http:request-config>
+	<flow name="until-successfulFlow" doc:id="12729c51-52aa-4d4b-9b26-2d000b02ca96" >
+		<http:listener doc:name="/untilsuccessful" doc:id="50590e1d-4ee3-42e8-8194-7732ec66fd2a" config-ref="HTTP_Listener_config" path="/untilsuccessful"/>
+		<ee:transform doc:name="Transform Message" doc:id="d1b50d44-8783-40ca-b0ac-639b343e7fdb" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Name" : "ravi",
+	"size" : "M"
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="bc80318b-406c-4500-90f4-3c3d11a0c63a" millisBetweenRetries="10000">
+			<http:request method="POST" doc:name="Request" doc:id="08d12fe4-d297-4154-afbf-fb04027d1ad7" config-ref="HTTP_Request_configuration" path="/getamount" />
+		</until-successful>
+		<logger level="INFO" doc:name="Logger" doc:id="7fc2746f-de1f-42c2-bef8-8eeeff0eb5e1" message="end log"/>
+	</flow>
+	<flow name="until-successfulFlow1" doc:id="51cef529-9795-4e04-aaf0-c9abca27da4f" >
+		<http:listener doc:name="Listener" doc:id="5352b176-50e6-4a69-bac2-0e62c6a91287" config-ref="HTTP_Listener_config" path="/firstsucessful"/>
+		<logger level="INFO" doc:name="Logger" doc:id="8073025a-83e2-4295-8ec4-9ceb0efd2d01" message='"started logger"'/>
+		<ee:transform doc:name="Transform Message" doc:id="7adbcb37-48d8-4228-80d3-b711d1df59c9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	"name" : "chandra"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<first-successful doc:name="First Successful" doc:id="6789ef4c-edb5-4dba-8954-cfdbdc6dfcde" >
+			<route >
+				<raise-error doc:name="Raise error" doc:id="cb02c7b4-d51a-4ee3-a882-50aca43749e0" type="ANY"/>
+				<logger level="INFO" doc:name="Logger" doc:id="a7b48a95-2bb4-4527-bcd5-bd1308b4e23b" message="route1"/>
+			</route>
+			<route >
+				<logger level="INFO" doc:name="Logger" doc:id="b95b38dc-9eb2-4423-97df-7a414706e0b6" message="route2"/>
+			</route>
+		</first-successful>
+		<logger level="INFO" doc:name="Logger" doc:id="ff9e8c47-40a1-4b87-832a-614f33b8ed4f" message="END LOGGER"/>
+	</flow>
+</mule>

@@ -1,0 +1,19 @@
+INDEX VERSION 1.131+D:\idfctraining\.metadata\.plugins\org.eclipse.jdt.core
+4205602535.index
+231459996.index
+2328269416.index
+3073962201.index
+3671734786.index
+762199885.index
+2376816241.index
+346163147.index
+1690891076.index
+2030992894.index
+4078578380.index
+332383186.index
+2216499802.index
+1671771997.index
+4135911311.index
+3022960169.index
+2494770522.index
+1668950712.index

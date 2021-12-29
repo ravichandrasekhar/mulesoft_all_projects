@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="237ddac1-9d00-41b0-bdb5-bce282d495d2" >
+		<http:listener-connection host="0.0.0.0" port="${secure::http.Port}" />
+	</http:listener-config>
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="9f5e7eb7-3524-47ef-b4b2-f5d42885c026" >
+		<jms:active-mq-connection username="${secure::jms.user}" password="${secure::jms.password}">
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="025ba350-9d88-46ff-9de7-e82a5669e5ea" file="properties\dev.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="cde7d0db-eb9e-4d90-9dfa-703000fd7263" file="properties\dev.yaml" key="ravichandrasekha" />
+	<flow name="jms-proj-ravichandraFlow1" doc:id="fbf66601-1c38-438f-bf3f-98649cda393b">
+		<jms:listener doc:name="On New Message" doc:id="f6bf4aa7-2546-44ba-9a73-21871fdb8ba9" config-ref="JMS_Config" destination="${secure::jms.destination1}">
+		</jms:listener>
+		<set-variable value="#[uuid()]" doc:name="correlationId" doc:id="6c177993-e7b3-41ba-b5ef-f3acb030f32f" variableName="correlationId"/>
+		<logger level="INFO" doc:name="display correlationId" doc:id="4cadbf48-0a2c-4c85-86b9-9c52295fe6b9" message="correlationId  --- #[vars.correlationId]"/>
+		<logger level="INFO" doc:name="Logger" doc:id="18c7f67f-1c8b-4d82-afa4-1082d0f05873" message="#[payload]"/>
+	</flow>
+	<flow name="jms-proj-ravichandraFlow" doc:id="e56504d3-deed-4686-b6d8-04adea9a944b" >
+		<http:listener doc:name="Listener" doc:id="9974fa03-d737-40e4-8667-216390d7d006" config-ref="HTTP_Listener_config" path="/jmsconsume"/>
+		<set-variable value="#[uuid()]" doc:name="correlationId" doc:id="19f8ddc3-be44-479c-a394-4b8a61c2658e" variableName="correlationId"/>
+		<logger level="INFO" doc:name="display correlationId" doc:id="33451ad6-e285-4b7f-b0be-3f1dabc99754" message="correlationid: -- #[vars.correlationId]"/>
+		<ee:transform doc:name="data" doc:id="83755e81-cf0e-47c3-92cc-7b9d9933784b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"name" : "sekhar"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<jms:publish doc:name="Publish" doc:id="bd916a84-3ed5-44d5-99ef-b8d7dff1e78d" config-ref="JMS_Config" destination="${secure::jms.destnation}"/>
+		<logger level="INFO" doc:name="display publish" doc:id="4bc723c7-5173-428c-b0ec-05a392296875" message="published consumer logger"/>
+		<jms:consume doc:name="Consume" doc:id="55402941-8614-4680-954f-eccbbeff45ed" config-ref="JMS_Config" destination="${secure::jms.destnation}">
+			<jms:consumer-type >
+				<jms:queue-consumer />
+			</jms:consumer-type>
+		</jms:consume>
+		<logger level="INFO" doc:name="display consumer logger" doc:id="0749158a-ef67-499f-ae87-0a474daf66e5" message="#[payload]"/>
+	</flow>
+</mule>

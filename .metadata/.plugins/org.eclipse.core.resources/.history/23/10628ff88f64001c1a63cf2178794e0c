@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="f6a83868-4da6-4191-938d-417be9eebfb6" file="properties\dev.yaml" key="ravichandrasekha" />
+	<configuration-properties doc:name="Configuration properties" doc:id="c54d2856-67da-4e65-9ee9-24de2cda2c03" file="properties\dev.yaml" />
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="801e5321-d63c-4834-a3f7-0ab0be4939c1" >
+		<http:listener-connection host="0.0.0.0" port="${secure::http.Port}" />
+	</http:listener-config>
+	<flow name="dataweave-papi-ravichandrasekharFlow" doc:id="403af048-6030-469a-9ac6-d31e5e72007b" >
+		<http:listener doc:name="/dataweave" doc:id="7b66ba2c-7538-472a-bc48-7f54c0fd15be" config-ref="HTTP_Listener_config" path="/dataweave"/>
+		<set-variable value="#[uuid()]" doc:name="correlationId" doc:id="73ef49ca-8e05-4fee-a61e-b42871199ca2" variableName="correlationId"/>
+		<logger level="INFO" doc:name="displaycorrelationId" doc:id="c6425cd6-0437-4ad9-b3b1-12398329875d" message="correlationId -- #[vars.correlationId] -- flowName -- #[flow.name]"/>
+		<set-payload value="#[1 as Number]" doc:name="gives payload" doc:id="f4b8b091-134c-4ffe-89d7-13b5a50f4458" />
+		<choice doc:name="Choice" doc:id="c66fc7cf-d560-44b7-aea2-813c9290afe8" >
+			<when expression="#[isEven(payload)]">
+				<ee:transform doc:name="even Payload" doc:id="2625b7b1-d1f2-46ae-9d66-cb5cdff558a5" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Numberpassed" : "number is even"
+}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="display even payload" doc:id="a8a0cf09-5734-499a-aed4-c9b955a99742" message="correlationId -- #[vars.correlationId] --- even logger"/>
+			</when>
+			<otherwise >
+				<set-payload value="number is odd " doc:name="odd Payload" doc:id="e1a9792c-b787-4ba4-8cb9-27827313bec7" />
+				<logger level="INFO" doc:name="Logger" doc:id="70ac3910-dfa9-49ee-8f54-260ebf3f906c" message="correlationId---#[vars.correlationId] -----number is odd"/>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="dataweave-papi-ravichandrasekharFlow1" doc:id="efe993c5-4fb6-4d31-9909-52f43081ab60" >
+		<http:listener doc:name="/replace" doc:id="6f72c2d8-4e01-4fc8-abae-b981659e21be" config-ref="HTTP_Listener_config" path="/replace"/>
+		<set-variable value="#[uuid()]" doc:name="correlationId" doc:id="b987ed09-ec21-4319-9233-eb84f844b55b" variableName="correlationId"/>
+		<logger level="INFO" doc:name="display correlarionId" doc:id="9eebc855-276e-4c3c-b35a-dfb50ff23649" message="corrlationId -- #[vars.correlationId]"/>
+		<set-variable value="#[attributes.queryParams.name]" doc:name="name" doc:id="652f4421-ad53-4644-8886-f18015d656d2" variableName="name"/>
+		<ee:transform doc:name="replace payload" doc:id="e6c51052-cf0f-4294-a267-399bd3a7bf5d" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"replacedname": vars.name replace 'har' with "123"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="display payload" doc:id="a09fde8d-199a-44b8-b010-653995d9447b" message="correlationid-  #[vars.correlationId] --- #[flow.name] --- #[payload]"/>
+	</flow>
+</mule>

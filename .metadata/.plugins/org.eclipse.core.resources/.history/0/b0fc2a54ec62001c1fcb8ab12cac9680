@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="4f654b18-b897-4134-8d75-2588c3307462" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="8b9997a5-ce3b-4cd8-a2e2-40866ed4dc5d" >
+		<file:connection workingDir="D:\input" />
+	</file:config>
+	<flow name="scatterlabFlow" doc:id="abcccb7e-1386-4411-af64-19b53162cd52" >
+		<http:listener doc:name="Listener" doc:id="99fc1517-132e-4d3b-8de6-4882a764ee7f" config-ref="HTTP_Listener_config" path="/scatter"/>
+		<set-payload value="#[attributes.queryParams.number as Number + 5 as Number]" doc:name="Set Payload" doc:id="74d0be9f-3812-450e-b375-c267aecf7ef5" />
+		<choice doc:name="Choice" doc:id="6c452af2-ef8d-43b1-8c90-48bceeae849c" >
+			<when expression="#[attributes.queryParams.number &gt; 7 as Number]">
+				<scatter-gather doc:name="Scatter-Gather" doc:id="4bf41e4a-999d-47ba-8ae4-c339e3dfebdb" >
+					<route >
+						<set-payload value="#[payload]" doc:name="Set Payload" doc:id="fc23ff63-6004-40c8-bf09-0dd7bc3d4219" />
+					</route>
+					<route >
+						<file:write doc:name="Write" doc:id="3ec32fd2-b52e-43a1-ab4e-567d74a63f68" config-ref="File_Config" path="filecontext.json"/>
+					</route>
+				</scatter-gather>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="Logger" doc:id="b0b5e069-5619-4ecd-b2f3-a4d4a35b04f1" message="default logger "/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

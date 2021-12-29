@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f0435b19-8da9-4a13-bbe6-68874ab9918b" >
+		<http:listener-connection host="0.0.0.0" port="${secure::http.Port}" />
+	</http:listener-config>
+	<db:config name="Database_Config1" doc:name="Database Config" doc:id="6b7b8bc4-11b6-486d-bc22-a60785789a37" >
+		<db:mssql-connection host="${sqldb.host}" port="${sqldb.Port}" user="${sqldb.user}" password="${secure::sqldb.password}" databaseName="${sqldb.dbName}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="07028629-6c34-4b30-a7f2-16bdcfb85196" file="properties\dev.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="634048a4-416e-4b42-9fa2-b837bc371d27" file="properties\dev.yaml" key="ravichandrasekha" />
+	<flow name="database-configFlow" doc:id="c59cc471-ff58-4015-ba9e-4840e7b2c76e" >
+		<http:listener doc:name="Listener" doc:id="fc3e7c28-f0d8-406a-9fb4-b36544e81ee2" config-ref="HTTP_Listener_config" path="/database"/>
+		<db:select doc:name="Select" doc:id="61c286b6-d5c0-4ee5-9272-9d19ebd76a60" config-ref="Database_Config1">
+			<db:sql ><![CDATA[SELECT * FROM production.categories ]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="989a9ecd-ffc2-4a9e-8029-530155a3b9af" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="454f4c24-2169-46d4-9628-4e82b9fe88ae" message="#[payload]"/>
+	</flow>
+	<flow name="database-configFlow1" doc:id="20e30843-e0bd-4701-a904-42f48df73bff" >
+		<http:listener doc:name="Listener" doc:id="96ed1a66-fdab-47dd-aef3-a3f1e5125753" config-ref="HTTP_Listener_config" path="/insert"/>
+		<logger level="INFO" doc:name="Logger" doc:id="32457cad-d6ce-476d-aa21-69af106ba9fd" message="started flow --- #[flow.name] --- #[payload]"/>
+		<db:insert doc:name="Insert" doc:id="65c0ae30-2393-4cd0-b574-4ef298f27f02" config-ref="Database_Config1">
+			<db:sql ><![CDATA[insert into production.categories (category_name) values (:value)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	value : attributes.queryParams.productName default 'ravichandrasekharvadrevu'
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="a10a9092-b7da-4511-bd60-d19a440a9ce7" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="database-configFlow2" doc:id="9182bde4-6007-46bb-9174-3a9395dae486" >
+		<db:listener table="production.categories" doc:name="On Table Row" doc:id="46ffb3d2-c9cf-4fa8-93d5-4612956bb700" config-ref="Database_Config1" watermarkColumn="category_id">
+			<scheduling-strategy >
+				<fixed-frequency frequency="10" timeUnit="SECONDS" />
+			</scheduling-strategy>
+		</db:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="8d939155-3c12-457e-8780-becc4dabec66" message="#[payload]"/>
+	</flow>
+</mule>

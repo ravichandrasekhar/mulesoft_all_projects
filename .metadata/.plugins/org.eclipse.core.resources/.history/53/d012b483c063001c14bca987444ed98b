@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:jms="http://www.mulesoft.org/schema/mule/jms" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="237ddac1-9d00-41b0-bdb5-bce282d495d2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<jms:config name="JMS_Config" doc:name="JMS Config" doc:id="9f5e7eb7-3524-47ef-b4b2-f5d42885c026" >
+		<jms:active-mq-connection username="admin" password="admin">
+			<jms:factory-configuration brokerUrl="tcp://localhost:61616" />
+		</jms:active-mq-connection>
+	</jms:config>
+	<flow name="jms-proj-ravichandraFlow1" doc:id="fbf66601-1c38-438f-bf3f-98649cda393b" >
+		<jms:listener doc:name="On New Message" doc:id="f6bf4aa7-2546-44ba-9a73-21871fdb8ba9" config-ref="JMS_Config" destination="Queue.user.consume">
+			<jms:consumer-type >
+				<jms:queue-consumer />
+			</jms:consumer-type>
+		</jms:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="18c7f67f-1c8b-4d82-afa4-1082d0f05873" message="#[payload]"/>
+	</flow>
+	<flow name="jms-proj-ravichandraFlow" doc:id="e56504d3-deed-4686-b6d8-04adea9a944b" >
+		<http:listener doc:name="Listener" doc:id="9974fa03-d737-40e4-8667-216390d7d006" config-ref="HTTP_Listener_config" path="/jmsconsume"/>
+		<jms:consume doc:name="Consume" doc:id="7bb1c622-45bb-47ce-bd88-c86502de069f" config-ref="JMS_Config" destination="Queue.user.consume" maximumWait="10" maximumWaitUnit="SECONDS">
+			<jms:consumer-type >
+				<jms:queue-consumer />
+			</jms:consumer-type>
+		</jms:consume>
+		<logger level="INFO" doc:name="Logger" doc:id="6335b072-888b-4b30-9fd5-9fad555cdeaa" message="#[payload]"/>
+	</flow>
+</mule>

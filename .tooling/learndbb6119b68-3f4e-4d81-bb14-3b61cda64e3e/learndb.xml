@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="46641029-9bd4-4686-b953-c10724f98fc6" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="2ada290a-4f97-4636-b01d-72c794140396" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="learndb" />
+	</db:config>
+	<flow name="learndbFlow" doc:id="840db8cf-0934-42de-a593-4b7819e8d4b3" >
+		<http:listener doc:name="/select" doc:id="c498f27a-f59b-4e75-9a48-0446ed10b1f3" config-ref="HTTP_Listener_config" path="/select"/>
+		<db:select doc:name="Select" doc:id="1c32a4bf-abbb-4e46-8127-c6b78a216082" />
+	</flow>
+</mule>

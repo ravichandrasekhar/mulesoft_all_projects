@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.mule.tooling.runtime.muleServerLaunchType">
+    <stringAttribute key="launch_mule_server_version" value="org.mule.tooling.server.4.4.0.ee"/>
+    <stringAttribute key="mule-agent-port" value="54889"/>
+    <stringAttribute key="mule-agent-token-auth" value="e50a0c73-fc12-46e1-b233-5eac0122cf4d"/>
+    <listAttribute key="mule-project-names">
+        <listEntry value="assesment-2-ravichandra"/>
+    </listAttribute>
+    <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="assesment-2-ravichandra"/>
+    <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-M-XX:-UseBiasedLocking -M-Dfile.encoding=UTF-8 -M-XX:+UseG1GC -M-XX:+UseStringDeduplication"/>
+</launchConfiguration>

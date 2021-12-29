@@ -1,0 +1,8 @@
+http:
+  Port: "8081"
+
+jms:
+  user: "admin"
+  password: "![vx3mnJfkSeOOslhXfKhoMA==]"
+  destnation: "Queue.user.consume"
+  destination1:  "test"

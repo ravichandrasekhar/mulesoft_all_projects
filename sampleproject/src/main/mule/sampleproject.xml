@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b1dc29b0-fb5c-4c5b-974b-f9e09f251144" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="sampleprojectFlow" doc:id="549d91b6-27f4-4cb4-b42d-db3137744a51" >
+		<http:listener doc:name="Listener" doc:id="8a885a83-dc0d-44db-aeeb-c3e6826fd859" config-ref="HTTP_Listener_config" path="/addition"/>
+		<logger level="INFO" doc:name="Logger" doc:id="308605a6-3582-4217-8073-e67bcede0e4c" message="started logger"/>
+		<ee:transform doc:name="Transform Message" doc:id="b40b8e1c-6259-42f6-9d56-a656d8cd75ae" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	
+	'result': attributes.queryParams.q1 as Number +	attributes.queryParams.q2 as Number
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="e8122eab-5957-43af-90a0-792860e38ab1" message='"result" -- #[payload]'/>
+	</flow>
+	<flow name="sampleprojectFlow1" doc:id="c8c95141-f0e6-4e18-b25c-fda8a1849233" >
+		<http:listener doc:name="Listener" doc:id="251c32fc-f019-431d-b649-190e170bc3c7" config-ref="HTTP_Listener_config" path="/multiply"/>
+		<logger level="INFO" doc:name="Logger" doc:id="7c624bbb-c2c7-4d5a-9bd2-70747caa78fb" message='"started logger"'/>
+		<ee:transform doc:name="Transform Message" doc:id="7e89f5eb-bfd5-4ed5-97d7-76d3b90007e6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"multiplynumber": (attributes.queryParams.m1 as Number) * (attributes.queryParams.m2 as Number) *(attributes.queryParams.m3 as Number)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="29b5eb02-d1db-4272-a933-5d72c27a21a4" message='"Result" --- #[payload]'/>
+	</flow>
+	<flow name="sampleprojectFlow2" doc:id="6a8f75f6-29bb-42d0-bf03-1112dd51bbd8" >
+		<http:listener doc:name="Listener" doc:id="1f017c0e-3abd-4fca-88e5-92e9aac3eb89" config-ref="HTTP_Listener_config" path="/headerPath"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dcc906b1-0609-4bc2-8fc1-b336f220fb26" message='"Header Logger Flow"'/>
+		<ee:transform doc:name="Transform Message" doc:id="6e970ee3-2d56-4a91-aa9a-e8253c2fd362" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"client id": attributes.headers.client_id,
+	"client secret": attributes.headers.client_secret
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="5d3cb237-3e65-4552-9cdd-09a321fc8a46" message="#[payload]"/>
+	</flow>
+</mule>

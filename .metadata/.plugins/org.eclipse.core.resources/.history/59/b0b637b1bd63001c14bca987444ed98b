@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="237ddac1-9d00-41b0-bdb5-bce282d495d2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="jms-proj-ravichandraFlow" doc:id="9117a2b5-57df-48f9-a26b-96a9ef9c4256" >
+		<http:listener doc:name="Listener" doc:id="adc61fb4-23fa-4131-9b56-04905b86f5cf" config-ref="HTTP_Listener_config" path="/jms"/>
+		<set-variable value="#[uuid()]" doc:name="Set Variable" doc:id="5e956de1-7110-491d-a152-41422c09853f" variableName="correlationId"/>
+		<logger level="INFO" doc:name="display correlationId" doc:id="69e72c6f-c5dc-4fd0-93ec-9fdf7a01eec2" message="correlationId -- #[vars.correlationId]"/>
+	</flow>
+</mule>

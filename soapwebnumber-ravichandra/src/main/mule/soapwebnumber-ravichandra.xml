@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c2596170-7fc5-407c-8b63-519c2e94b847" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="3b712766-0d4f-45d7-9ad5-e60d19ed09a7" >
+		<wsc:connection wsdlLocation="https://www.dataaccess.com/webservicesserver/NumberConversion.wso?wsdl" service="NumberConversion" port="NumberConversionSoap12" address="https://www.dataaccess.com/webservicesserver/NumberConversion.wso" />
+	</wsc:config>
+	<flow name="soapwebnumber-ravichandraFlow" doc:id="b434adc8-9892-425c-b49d-126fc2a40b5f" >
+		<http:listener doc:name="/numbertodollars" doc:id="62a4e8d6-2b03-47df-a868-9e7437522d1a" config-ref="HTTP_Listener_config" path="/numbertodollars"/>
+		<ee:transform doc:name="conversionofNumberToDollars" doc:id="4929a576-3b6b-4b81-8245-317104d40091" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.dataaccess.com/webservicesserver/
+---
+{
+	ns0#NumberToDollars: {
+		ns0#dNum: payload.value1
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="NumberToDollars" doc:name="NumberToDollars" doc:id="5493d300-20ff-45ae-8d4b-f926a9091431" config-ref="Web_Service_Consumer_Config"/>
+		<ee:transform doc:name="resultofNumberToDollars" doc:id="bdd7beec-9518-43da-a11b-792ecf4e84e6" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0ns ns0 http://www.dataaccess.com/webservicesserver/
+
+output application/json
+---
+{
+	"result": payload.body.ns0#NumberToDollarsResponse.ns0#NumberToDollarsResult
+}
+]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="display numer to dollars payload" doc:id="132e42d4-4177-44f7-8c6f-356cdd911ae7" message="#[payload]"/>
+	</flow>
+	<flow name="soapwebnumber-ravichandraFlow1" doc:id="d905cff1-67e5-46cf-8baa-eaa9cc983ec9" >
+		<http:listener doc:name="/numbertowords" doc:id="d964b0cc-4545-4800-86c7-ad2fc2ad44fb" config-ref="HTTP_Listener_config" path="/numbertowords"/>
+		<ee:transform doc:name="conversionOfNumberToWords" doc:id="0d8d1a70-1383-4882-a199-e6ff7eb60d0f">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://www.dataaccess.com/webservicesserver/
+---
+{
+	ns0#NumberToWords: {
+		ns0#ubiNum: payload.value1
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<wsc:consume operation="NumberToWords" doc:name="NumberToWords" doc:id="9404a45e-86fa-4ea9-820b-7e09b5b7a417" config-ref="Web_Service_Consumer_Config"/>
+		<ee:transform doc:name="resultOfNumberToWords" doc:id="f9f2b660-7424-4b31-9d63-486f6a3c7791" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0ns ns0 http://www.dataaccess.com/webservicesserver/
+
+output application/json
+---
+{
+	"result": payload.body.ns0#NumberToWordsResponse.ns0#NumberToWordsResult
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="dislay NumberToWords payload" doc:id="f4b44091-5672-4db1-bc81-d9fbae67101b" message="#[payload]"/>
+	</flow>
+</mule>

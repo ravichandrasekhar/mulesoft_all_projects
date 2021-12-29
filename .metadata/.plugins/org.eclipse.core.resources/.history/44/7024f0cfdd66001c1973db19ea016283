@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ecfe6736-e706-4f65-a65f-dad9a61741b2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="transformmessage-ravichandraFlow" doc:id="33e5406c-6cc8-475f-8f5e-cd055f12f668" >
+		<http:listener doc:name="Listener" doc:id="ac0d6e0d-678b-462a-a8f4-b6e1ba7c4e73" config-ref="HTTP_Listener_config" path="/xml"/>
+		<ee:transform doc:name="Transform Message" doc:id="6df91031-d922-4b74-bc24-a78dd71edc12" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+candidateProfile:payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="transformmessage-ravichandraFlow1" doc:id="b6a5b4cd-493d-47c5-ac75-5ab5fb8ec6a4" >
+		<http:listener doc:name="Listener" doc:id="5e4c55af-7202-489e-9a7e-3e0bbf8615ef" config-ref="HTTP_Listener_config" path="/json"/>
+		<ee:transform doc:name="Transform Message" doc:id="06dfb110-0150-4ff6-bb5f-7c196c7e689b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var name = payload.name
+var address = payload.address
+output application/java
+---
+[name,
+	address
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

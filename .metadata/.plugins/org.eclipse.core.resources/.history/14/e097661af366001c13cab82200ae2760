@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ecfe6736-e706-4f65-a65f-dad9a61741b2" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="transformmessage-ravichandraFlow" doc:id="33e5406c-6cc8-475f-8f5e-cd055f12f668" >
+		<http:listener doc:name="Listener" doc:id="ac0d6e0d-678b-462a-a8f4-b6e1ba7c4e73" config-ref="HTTP_Listener_config" path="/xml"/>
+		<ee:transform doc:name="Transform Message" doc:id="6df91031-d922-4b74-bc24-a78dd71edc12" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+---
+candidateProfile:payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="transformmessage-ravichandraFlow1" doc:id="b6a5b4cd-493d-47c5-ac75-5ab5fb8ec6a4" >
+		<http:listener doc:name="Listener" doc:id="5e4c55af-7202-489e-9a7e-3e0bbf8615ef" config-ref="HTTP_Listener_config" path="/json"/>
+		<ee:transform doc:name="Transform Message" doc:id="06dfb110-0150-4ff6-bb5f-7c196c7e689b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+var name = payload.Profiles.name
+var LastName = payload.Profiles.LastName
+var Profession= payload.Profiles.Profession
+output application/json
+---
+[ name,
+	LastName,
+	Profession
+]]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="transformmessage-ravichandraFlow2" doc:id="1ad79cc9-44a3-484c-879b-e215ff7b6ecb" >
+		<http:listener doc:name="Listener" doc:id="a5a91504-26fe-4a6a-928e-beb7abe01c1e" config-ref="HTTP_Listener_config" path="/execrise1"/>
+		<ee:transform doc:name="Transform Message" doc:id="6436f9d6-616f-450d-951c-e5b95186667a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var t=payload.environment.stage
+---
+t]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="transformmessage-ravichandraFlow3" doc:id="a6101531-c8b1-48e8-aa48-7c58037a7c4c" >
+		<http:listener doc:name="Listener" doc:id="722abbf9-5136-478b-9f0a-5e2fee7c0f3d" config-ref="HTTP_Listener_config" path="/excerise2"/>
+		<ee:transform doc:name="Transform Message" doc:id="fcaeb6d4-1ec5-4b23-922a-b081c650e301" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(payload.name == 'Mulesfot'){
+	firstName: "firstname is correct"
+}
+else{
+	firstName: "Is correct"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="transformmessage-ravichandraFlow4" doc:id="539dd00d-3e8b-4dcb-b07f-bba1334b8815" >
+		<http:listener doc:name="Listener" doc:id="2aa47214-ffed-455a-9794-01d3a275345c" config-ref="HTTP_Listener_config" path="/excerise3"/>
+		<ee:transform doc:name="Transform Message" doc:id="e86a1a34-5b06-47e5-a203-342e1489e393" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+if(payload.bookid == "1"){
+    "bookName" : payload.bookname
+} 
+ else {
+    "bookName": "Not a valid book"
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

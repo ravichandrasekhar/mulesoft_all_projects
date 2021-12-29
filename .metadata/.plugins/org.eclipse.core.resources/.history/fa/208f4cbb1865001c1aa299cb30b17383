@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:java="http://www.mulesoft.org/schema/mule/java"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3d06cc0b-1b6a-43bb-a814-f6d4f46445c0" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="bb4d69fa-4164-4386-b4b4-3aeff41acfd2" >
+		<file:connection workingDir="C:\Users\ravichandrav\Documents\writeFile" />
+	</file:config>
+	<flow name="assesment-3-papi-sekharFlow" doc:id="93f2639d-0d90-430a-8786-ba2292088a4b" >
+		<http:listener doc:name="Listener" doc:id="8b65e001-5539-4612-a55d-ba3f2ceba4af" config-ref="HTTP_Listener_config" path="/assesment"/>
+		<set-variable value="#[uuid()]" doc:name="correlaionId" doc:id="dab7f5cf-1589-4b34-a8ec-a85e9d36099c" variableName="correlaionId"/>
+		<logger level="INFO" doc:name="display correlationId" doc:id="a43d4adc-b611-47f4-af68-39e1299f82e7" message="correlationId-#[vars.correlaionId]"/>
+		<choice doc:name="Choice" doc:id="fdd57c8d-8429-4124-8c1c-35b3206ea80f" >
+			<when expression="#[isEven(attributes.queryParams.number as Number)]">
+				<ee:transform doc:name="Transform Message" doc:id="b3a2501e-a8ab-4517-8ae8-fa368beb87df" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+
+(1 to 10) map ((item, index) -> attributes.queryParams.number * item )]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<file:write doc:name="Write" doc:id="29845a13-83c6-459e-a8b5-5889c190942d" config-ref="File_Config" path="multiply.json"/>
+			</when>
+			<otherwise >
+				<java:new doc:name="New" doc:id="37a98462-b8ab-4dd1-ab6c-af6db184e457" class="javahome.Sales" constructor="Sales()" target="objectstatic"/>
+				<java:invoke doc:name="Invoke" doc:id="4bf14cad-743f-483e-88b7-cecb2620efa9" instance="#[vars.objectstatic]" class="javahome.Sales" method="getMessage()"/>
+				<logger level="INFO" doc:name="Logger" doc:id="f794775e-8f3a-4fec-adf8-d7fb5af4c81f" message="correlationId --- #[vars.correlaionId] --- #[payload]"/>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>

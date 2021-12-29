@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="project-2Flow" doc:id="9b68f954-ce02-4f5c-8d9e-fab6e051b3f4" >
+		<http:listener doc:name="project2Listener" doc:id="44a5a56f-7cea-42f2-9c65-019dbf59a0e8" config-ref="HTTP_Listener_config" path="/project2"/>
+		<db:select doc:name="Select" doc:id="a72a21a2-6b82-4535-b883-7a237c154c89" config-ref="Database_Config">
+			<db:sql ><![CDATA[SELECT * FROM production.categories ]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="60c40a60-0b67-4f83-97f3-ec4682de4360" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1590a339-314f-4aca-b69b-9fa4e9bf4363" message="project2"/>
+	</flow>
+</mule>

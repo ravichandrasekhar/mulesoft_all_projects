@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<flow name="assesment-3-2-papi-sekharFlow" doc:id="b291bc6f-8b5f-4cea-b516-e54e61c5dc26" >
+		<http:listener doc:name="Listener" doc:id="eae72e8c-ccb9-411e-8b4d-a29e8f07d050" config-ref="domain_HTTP_Listener_config" path="/project1"/>
+		<set-variable value="#[uuid()]" doc:name="Set Variable" doc:id="480f1d91-3f2d-49a0-a4aa-f1be51c8bc04" variableName="correlationId"/>
+		<logger level="INFO" doc:name="display correlationId" doc:id="a442a3e6-b3c8-4ee4-a1f4-e7663b08380c" message="correlationId-  #[vars.correlationId] "/>
+		<db:insert doc:name="Insert" doc:id="e0fa2601-79b9-44d8-a5e9-d8af56560465" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into production.categories (category_name) values ('ravi')]]></db:sql>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="766802db-669a-463a-9f27-f9cf879cb800" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="72d5f6be-766e-4caf-a771-b2bf5e1d748d" message="correlationid ---  #[vars.correlationId] --- #[payload]"/>
+	</flow>
+</mule>

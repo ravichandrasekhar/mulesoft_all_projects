@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain:mule-domain
+        xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+        xmlns:db="http://www.mulesoft.org/schema/mule/db"
+        xmlns:http="http://www.mulesoft.org/schema/mule/http"
+        xmlns="http://www.mulesoft.org/schema/mule/core"
+        xmlns:domain="http://www.mulesoft.org/schema/mule/ee/domain" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xsi:schemaLocation="
+               http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+               http://www.mulesoft.org/schema/mule/ee/domain http://www.mulesoft.org/schema/mule/ee/domain/current/mule-domain-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	<http:listener-config name="domain_HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="bc5e1d3a-024a-4288-8f82-61e8ea074696" >
+		<http:listener-connection host="0.0.0.0" port="${secure::http.Port}" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="b5c74694-d0e3-4b42-8269-de0b875fa321" >
+		<db:mssql-connection host="${secure::sqldb.host}" port="${secure::sqldb.Port}" user="${secure::sqldb.user}" password="${secure::sqldb.password}" databaseName="${secure::sqldbName}" />
+	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="bbf860ae-0672-4b34-a6fb-b753403cc426" file="properties\dev.yaml" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="5ba634d6-d744-4d08-b319-0e84bcce2f02" file="properties\dev.yaml" key="ravichandrasekha" />
+
+
+    <!-- configure here resource to be shared within the domain -->
+
+</domain:mule-domain>
