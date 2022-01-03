@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="learndb-suite.xml" />
+	<munit:test name="learndbFlow1-sucess" doc:id="118f6e7a-680e-4b34-9f00-6786c082d190" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select" doc:id="4847a20d-4a92-473f-8188-479f4e84cd4a" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="98b3ba32-7385-4c02-94fa-4a4d923d1795" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://learndbFlow1sucess\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="082f8391-0b2f-46e7-abb6-6667620eff5c" >
+				<munit:payload value="#[readUrl('classpath://learndbFlow1sucess\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://learndbFlow1sucess\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to learndbFlow1" doc:id="fd74475d-986f-430b-8294-edb328ea45ee" name="learndbFlow1"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="29f3e876-13d7-4e77-8b74-abe16ab3a0cc" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import learndbFlow1sucess::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="learndbFlow1-failure" doc:id="830e9a17-d405-4ebe-9339-4e1ce0186e63" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Select" doc:id="b5b64d74-c28c-4f16-b39c-35886a57c7bf" processor="db:select">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="98b3ba32-7385-4c02-94fa-4a4d923d1795" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://learndbFlow1failure\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="7c81c6a6-bb7f-475e-bd96-c2a9cdc6f2a7" >
+				<munit:payload value="#[readUrl('classpath://learndbFlow1failure\set-event_payload.dwl')]" encoding="UTF-8" />
+				<munit:attributes value="#[readUrl('classpath://learndbFlow1failure\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to learndbFlow1" doc:id="36fc25e8-e40a-4337-af27-1b913bd150aa" name="learndbFlow1"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="08935426-2555-4b18-a300-712239c093a4" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import learndbFlow1failure::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="learndbFlow-insert" doc:id="2a3d030a-038f-428f-896d-30a59e7a6076" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock Insert" doc:id="b657667f-68d5-4d93-864a-ccfbfbcb5aa1" processor="db:insert">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="e84f1e38-157c-4162-9352-697db7c825f6" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[output application/java --- readUrl('classpath://learndbFlowinsert\mock_payload.dwl')]" mediaType="application/java" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit:set-event doc:name="Set Input" doc:id="7f62363a-772e-41d2-ae7f-9ae5e9399eab" >
+				<munit:payload value="#[output application/json --- readUrl('classpath://learndbFlowinsert\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				<munit:attributes value="#[readUrl('classpath://learndbFlowinsert\set-event_attributes.dwl')]" />
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to learndbFlow" doc:id="daaa82ab-3bdf-4faa-837e-81ff32c4dccb" name="learndbFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert doc:name="Assert payload" doc:id="88584671-d4e8-40b4-8541-c7b3a056216b" message="The payload does not match">
+				<munit-tools:that ><![CDATA[#[%dw 2.0
+import learndbFlowinsert::assert_expression_payload
+---
+assert_expression_payload::main({payload: payload, attributes: attributes, vars: vars})]]]></munit-tools:that>
+			</munit-tools:assert>
+		</munit:validation>
+	</munit:test>
+
+
+</mule>

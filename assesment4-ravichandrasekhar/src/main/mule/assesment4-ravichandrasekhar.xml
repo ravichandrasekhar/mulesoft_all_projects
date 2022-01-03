@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f5e7bb16-837d-4085-a5f1-78c1e015f875" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="assesment4-ravichandrasekharFlow" doc:id="1045b0ed-0cef-4b6a-9ed6-bb969118e010" >
+		<http:listener doc:name="Listener" doc:id="ff74734d-bdd6-4fbf-b932-42880bfa48e9" config-ref="HTTP_Listener_config" path="/assesment1raiseerror"/>
+		<choice doc:name="Choice" doc:id="fc4b20a0-f223-448b-9661-15a68bd06c21" >
+			<when expression="#[isEmpty(payload)]">
+				<raise-error doc:name="Raise error" doc:id="04669267-4dfa-4e8c-8134-73f0a8dc080f" type="AP:PAYLOAD" description="NO PAYLOAD IS PRESENT"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="ef2452d8-105c-441c-824d-471f5499fc27" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="assesment4-ravichandrasekharFlow1" doc:id="20c4fe9b-bd2b-4d0e-a4d7-1f903fd5b10e" >
+		<http:listener doc:name="Listener" doc:id="626bc4f3-a169-4d5a-912e-80afa07e09a9" config-ref="HTTP_Listener_config" path="/assesment2try"/>
+		<logger level="INFO" doc:name="Logger" doc:id="43fdc988-201e-4c98-8423-161c5e7ec7f8" message='"main flow has been intitated"'/>
+		<flow-ref doc:name="Flow Reference" doc:id="5dd4fd86-7dbe-43e0-8535-d988da8efce1" name="assesment4-ravichandrasekharSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="dde34677-d095-46ea-888a-eb8c278ae6bb" message='"end of the logger"'/>
+	</flow>
+	<sub-flow name="assesment4-ravichandrasekharSub_Flow" doc:id="dcd86340-cf91-4328-b15c-5fcdb4c49f90" >
+		<try doc:name="Try" doc:id="65c1d067-e089-422f-8670-261ae6fe2945" >
+			<http:request method="GET" doc:name="Request" doc:id="64e468b4-d8dc-4766-8880-7685f864eb04" url="user.com"/>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="a0e63b5b-a455-4fca-b893-d7f16b1faafd" type="HTTP:CONNECTIVITY">
+					<ee:transform doc:name="Transform Message" doc:id="69baafc0-5f7d-49dd-95ab-7910a6cce342" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"message" : error.description]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+				</on-error-continue>
+			</error-handler>
+		</try>
+	</sub-flow>
+</mule>

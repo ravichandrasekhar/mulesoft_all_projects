@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<flow name="mcqFlow" doc:id="f6f9f39e-7518-493e-bc03-73547ea9b65e" >
+		<http:listener doc:name="Listener" doc:id="706d243d-500d-4abf-87aa-4e98ae3aac6a" config-ref="HTTP_Listener_config" path="/sss"/>
+		<set-payload value='#["value A"]' doc:name="Set Payload" doc:id="c9989934-14a9-4816-b6c7-0a88eac98b9f" />
+		<raise-error doc:name="Raise error" doc:id="9c7d1f5e-0968-4a98-aa6d-5a39a06cba12" type="AP:MYERROR" description="NO PAYLOAD IS RETURNED"/>
+		<set-payload value='#["value B"]' doc:name="Set Payload" doc:id="3791c090-7f86-4b29-96c2-139e6b788a68" />
+		<error-handler >
+			<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="303e24ae-0d30-451c-b550-025831e495c8" >
+				<set-payload value='#["value c"]' doc:name="Set Payload" doc:id="3dfa9c0c-9739-40b4-b7f4-c4df4281919f" />
+			</on-error-propagate>
+		</error-handler>
+	</flow>
+</mule>

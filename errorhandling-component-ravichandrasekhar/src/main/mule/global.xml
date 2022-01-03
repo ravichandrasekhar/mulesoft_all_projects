@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<configuration doc:name="Configuration" doc:id="6bc6dee1-4807-46d1-8e25-78c0e1177c1e" defaultErrorHandler-ref="globalError_Handler" />
+	<error-handler name="globalError_Handler" doc:id="a5a7aa99-8af6-4b32-bf76-5e39ad9ee2f8" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="659dc323-cea1-46db-8cc2-c325d90e72de" type="ANY">
+			<ee:transform doc:name="Transform Message" doc:id="d5ede28a-791a-4df6-a798-4558b8b58ce4" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"ERROR" : "INVALID"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-continue>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9c37992a-7eaa-4b9c-be2e-a4cea1d021a9" type="USER:NOTFOUND">
+			<ee:transform doc:name="Transform Message" doc:id="af62a5b3-231c-40e4-9c6a-11f033b5ecaf" >
+				<ee:message >
+					<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"error" : "error"
+}]]></ee:set-payload>
+				</ee:message>
+			</ee:transform>
+		</on-error-propagate>
+	</error-handler>
+</mule>

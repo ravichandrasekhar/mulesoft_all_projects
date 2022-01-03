@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f09709c6-65df-40d5-b89d-85761c62de37" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<validation:config name="Validation_Config" doc:name="Validation Config" doc:id="4d9db14d-b8b4-41ee-a949-bc3235fd9da5" />
+	<flow name="errorhandling-component-ravichandrasekharFlow" doc:id="b8d5f061-e07a-40c6-a726-aba059749e14" >
+		<http:listener doc:name="Listener" doc:id="91e1a275-0e8a-4684-99d1-6b67ed74a970" config-ref="HTTP_Listener_config" path="/tryblock"/>
+		<set-payload value='#["12ee"]' doc:name="Set Payload" doc:id="51fd8f6d-c84d-45e3-a457-c7faf993d382" />
+		<try doc:name="Try" doc:id="1136dc14-490d-4ad4-bea6-b2bee3f0c7fe" >
+			<validation:is-number numberType="INTEGER" doc:name="Is number" doc:id="5721062e-1377-4444-bd0b-9b0367254cfb" config-ref="Validation_Config" value="#[payload]" />
+		</try>
+		<ee:transform doc:name="Transform Message" doc:id="dfa90418-2948-4b77-bd77-83e662ee8ae8" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="errorhandling-component-ravichandrasekharFlow1" doc:id="3a5ee00d-fff1-4d74-84c0-7ca0bdf9638e" >
+		<http:listener doc:name="Listener" doc:id="e51f1ea7-0055-4d86-843a-93526d156fb8" config-ref="HTTP_Listener_config" path="/errorhandler"/>
+		<choice doc:name="Choice" doc:id="203989cc-fb79-42da-967e-832276706fc9" >
+			<when expression="#[isEmpty(payload)]">
+				<raise-error doc:name="Raise error" doc:id="e2a95f6b-fb93-45c9-8553-58fb6546cbde" type="USER:NOTFOUND" description="USER NOT FOUND"/>
+			</when>
+			<otherwise >
+				<ee:transform doc:name="Transform Message" doc:id="70411939-c594-439c-a923-f2a65ab1c0d7" >
+					<ee:message >
+						<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+			</otherwise>
+		</choice>
+	</flow>
+</mule>
