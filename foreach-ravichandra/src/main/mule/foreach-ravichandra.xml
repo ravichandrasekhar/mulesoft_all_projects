@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="ee12349b-dba9-4473-ac00-2adb6a71a442" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="bf1b630b-907e-4e0b-9d89-25bae5f8748f" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="learndb" />
+	</db:config>
 	<flow name="foreach-ravichandraFlow" doc:id="8c76d2cb-1ba5-46b9-8233-18ebbb19b24d" >
 		<http:listener doc:name="Listener" doc:id="6533598c-f242-4fc3-8d5c-8a1d81bd5987" config-ref="HTTP_Listener_config" path="/foreach"/>
 		<set-payload value="#[[1,2,'s',4,5]]" doc:name="Set Payload" doc:id="2ab8faca-577e-4a88-a7f3-5bc0fcebf0a0" />
@@ -47,5 +51,34 @@ output application/json
 payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
+	</flow>
+	<flow name="foreach-ravichandraFlow2" doc:id="924ef5a2-a708-42c4-b435-803bac13c2e9" >
+		<http:listener doc:name="Listener" doc:id="d2f9045a-3265-4a03-97fd-1930e9916ef5" config-ref="HTTP_Listener_config" path="/batchprocessor1"/>
+		<batch:job jobName="foreach-ravichandraBatch_Job1" doc:id="e30c4327-8670-4bfe-87bb-27f66fef351b" maxFailedRecords="-1">
+			<batch:process-records>
+				<batch:step name="Batch_Step2" doc:id="5ca2467a-7585-4a43-9738-4a1769eed4fc" >
+					<db:insert doc:name="Insert" doc:id="0bb5e994-f09a-4a47-b767-736bf21212f3" config-ref="Database_Config">
+							<db:sql><![CDATA[insert into learndb.account_holders (AccountNumber,name,mobileNo,Address) VALUES (:AccountNumber,:name,:mobileNo,:Address);]]></db:sql>
+							<db:input-parameters><![CDATA[#[{
+	"AccountNumber" : payload.AccountNumber,
+	"name" : payload.name,
+	"mobileNo" : payload.mobileNo,
+	"Address" : payload.Address
+}]]]></db:input-parameters>
+						</db:insert>
+					<ee:transform doc:name="Transform Message" doc:id="8bcf9bfd-b642-47c0-bcb1-9764a8cf926e">
+							<ee:message>
+								<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="ec996742-9d5c-4707-8ef2-f07dbe5ecfdc" streaming="true">
+						<logger level="INFO" doc:name="Logger" doc:id="3586e141-3db9-4ef9-825e-cadfe4343ea8" message='"inside the batch processor"' />
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+		</batch:job>
 	</flow>
 </mule>
