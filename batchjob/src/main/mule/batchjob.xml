@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:batch="http://www.mulesoft.org/schema/mule/batch"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/batch http://www.mulesoft.org/schema/mule/batch/current/mule-batch.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="a59ce67d-3053-4d46-84f7-fb7dca8b3f28" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="5a9d9369-1270-4150-90fd-0a844bcea0c9" >
+		<db:my-sql-connection host="localhost" port="3306" user="root" password="root" database="learndb" />
+	</db:config>
+	<flow name="batchjobFlow" doc:id="44c86d3c-a456-4371-928e-dc9b900b54ba" >
+		<http:listener doc:name="Listener" doc:id="04e22a00-1ac7-4c7d-b9a5-92d705a821eb" config-ref="HTTP_Listener_config" path="/batchstep"/>
+		<batch:job jobName="batchjobBatch_Job" doc:id="f0c20f6c-6ba2-4a38-b66e-b3c5e02c1089" maxFailedRecords="-1">
+			<batch:process-records >
+				<batch:step name="Batch_Step" doc:id="05f15d0f-8bf5-4b75-aad9-9738fbe87c51" acceptPolicy="ALL">
+					<db:insert doc:name="Insert" doc:id="4de7e1b0-d859-475e-97b7-9e7e36d08453" config-ref="Database_Config">
+						<db:sql ><![CDATA[insert into learndb.account_holders(AccountNumber,name,mobileNo,Address) VALUES (:AccountNumber,:name,:mobileNo,:Address)]]></db:sql>
+						<db:input-parameters ><![CDATA[#[{
+	AccountNumber : payload.AccountNumber,
+	name : payload.name,
+	mobileNo : payload.mobileNo,
+	Address : payload.Address
+}]]]></db:input-parameters>
+					</db:insert>
+					<ee:transform doc:name="Transform Message" doc:id="b0d09bd9-a30a-452f-b2ca-3d9187c22688" >
+						<ee:message >
+							<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+					<batch:aggregator doc:name="Batch Aggregator" doc:id="d01dd064-0c5e-419c-98eb-42b7e7f3576d" streaming="true">
+						<ee:transform doc:name="Transform Message" doc:id="e233fd74-1299-41e9-ae88-18ab0a048452" >
+							<ee:message >
+								<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+							</ee:message>
+						</ee:transform>
+					</batch:aggregator>
+				</batch:step>
+			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="9ebbca9d-b485-4e9a-94f3-befd8bc1347e" message="#[payload]"/>
+			</batch:on-complete>
+		</batch:job>
+	</flow>
+	<flow name="batchjobFlow1" doc:id="558c1f29-5798-4aa1-8db3-48d4a0a05a13" >
+		<http:listener doc:name="Listener" doc:id="5952f172-2e9d-4289-ba89-ba328e089501" config-ref="HTTP_Listener_config" path="/db"/>
+		<db:insert doc:name="Insert" doc:id="0c2e2e6c-6d70-4a4c-98b6-c5f6b3bc303c" config-ref="Database_Config">
+			<db:sql ><![CDATA[insert into learndb.account_holders (AccountNumber,name,mobileNo,Address) VALUES (:AccountNumber,:name,:mobileNo,:Address)]]></db:sql>
+			<db:input-parameters ><![CDATA[#[{
+	AccountNumber : payload.AccountNumber,
+	name : payload.name,
+	mobileNo : payload.mobileNo,
+	Address : payload.Address
+}]]]></db:input-parameters>
+		</db:insert>
+		<ee:transform doc:name="Transform Message" doc:id="689b10e5-b27c-4a38-872f-0becffa68195" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

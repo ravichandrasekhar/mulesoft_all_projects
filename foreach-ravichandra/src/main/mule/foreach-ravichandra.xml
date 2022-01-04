@@ -60,10 +60,10 @@ payload]]></ee:set-payload>
 					<db:insert doc:name="Insert" doc:id="0bb5e994-f09a-4a47-b767-736bf21212f3" config-ref="Database_Config">
 							<db:sql><![CDATA[insert into learndb.account_holders (AccountNumber,name,mobileNo,Address) VALUES (:AccountNumber,:name,:mobileNo,:Address);]]></db:sql>
 							<db:input-parameters><![CDATA[#[{
-	"AccountNumber" : payload.AccountNumber,
-	"name" : payload.name,
-	"mobileNo" : payload.mobileNo,
-	"Address" : payload.Address
+	AccountNumber : payload.AccountNumber,
+	name : payload.name,
+	mobileNo : payload.mobileNo,
+	Address : payload.Address
 }]]]></db:input-parameters>
 						</db:insert>
 					<ee:transform doc:name="Transform Message" doc:id="8bcf9bfd-b642-47c0-bcb1-9764a8cf926e">
@@ -79,6 +79,9 @@ payload]]></ee:set-payload>
 					</batch:aggregator>
 				</batch:step>
 			</batch:process-records>
+			<batch:on-complete >
+				<logger level="INFO" doc:name="Logger" doc:id="798ea71d-4446-45f5-81e4-d9a20dc32627" message="#[payload]"/>
+			</batch:on-complete>
 		</batch:job>
 	</flow>
 </mule>
