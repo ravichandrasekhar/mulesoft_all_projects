@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="578df24f-21eb-4d19-abe3-dac990606f95" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="projectnameFlow" doc:id="a839d2b7-d7b5-4e10-ab12-184276bd168d" >
+		<http:listener doc:name="Listener" doc:id="29c9254a-6d5e-4a6d-9178-18395b3656f9" config-ref="HTTP_Listener_config" path="/path"/>
+		<logger level="INFO" doc:name="Logger" doc:id="a6dc9d8d-e898-4d9b-b9db-51bd15dd6b93" message='"welcome to git project"'/>
+	</flow>
+</mule>

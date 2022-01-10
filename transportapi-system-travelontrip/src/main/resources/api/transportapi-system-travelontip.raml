@@ -1,0 +1,14 @@
+#%RAML 1.0
+title: transportapi-system-TravelOnTip
+description: "This an Transport application"
+resourceTypes:
+  routeData: !include api/routeresourceType.raml
+  schuduleData : !include api/schuduleresourceType.raml
+/{transportType}:
+   /{transportCompany}:
+       /routes:
+          type:
+            routeData
+       /schudule:
+          type: schuduleData
+            
